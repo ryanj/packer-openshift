@@ -1,5 +1,7 @@
 # OpenShift images for Instruqt
 
+latest build preview available here: https://storage.googleapis.com/crc-vm/crc-1.31.vmdk
+
 GCloud Pre-requisites:
 
 1. python3.8 or newer is required. reboot after installing python3
@@ -13,28 +15,25 @@ GCloud Pre-requisites:
 
 n. Create a new service account? (default)
 
-gcloud iam service-accounts create packer \
-  --project YOUR_GCP_PROJECT \
+$ export PROJECT=YOUR_PROJECT_ID
+
+$ gcloud iam service-accounts create packer \
+  --project $PROJECT \
   --description="Packer Service Account" \
   --display-name="Packer Service Account"
 
-$ gcloud projects add-iam-policy-binding YOUR_GCP_PROJECT \
-    --member=serviceAccount:packer@YOUR_GCP_PROJECT.iam.gserviceaccount.com \
+$ gcloud projects add-iam-policy-binding $PROJECT \
+    --member=serviceAccount:packer@$PROJECT.iam.gserviceaccount.com \
     --role=roles/compute.instanceAdmin.v1
 
-$ gcloud projects add-iam-policy-binding YOUR_GCP_PROJECT \
-    --member=serviceAccount:packer@YOUR_GCP_PROJECT.iam.gserviceaccount.com \
+$ gcloud projects add-iam-policy-binding $PROJECT \
+    --member=serviceAccount:packer@$PROJECT.iam.gserviceaccount.com \
     --role=roles/iam.serviceAccountUser
 
-$ gcloud projects add-iam-policy-binding YOUR_GCP_PROJECT \
-    --member=serviceAccount:packer@YOUR_GCP_PROJECT.iam.gserviceaccount.com \
+$ gcloud projects add-iam-policy-binding $PROJECT \
+    --member=serviceAccount:packer@$PROJECT.iam.gserviceaccount.com \
     --role=roles/iap.tunnelResourceAccessor
 
-$ gcloud compute instances create INSTANCE-NAME \
-  --project YOUR_GCP_PROJECT \
-  --image-family ubuntu-2004-lts \
-  --image-project ubuntu-os-cloud \
-  --network YOUR_GCP_NETWORK \
-  --zone YOUR_GCP_ZONE \
-  --service-account=packer@YOUR_GCP_PROJECT.iam.gserviceaccount.com \
-  --scopes="https://www.googleapis.com/auth/cloud-platform"
+$ qemu-img convert -f qcow2 -O vmdk -o subformat=streamOptimized,compat6 ~/.crc/cache/crc_libvirt_4.8.4/crc.qcow2 crc-1.31.vmdk
+
+upload the resulting image to google cloud storage
