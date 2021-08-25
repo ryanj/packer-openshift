@@ -34,6 +34,10 @@ $ gcloud projects add-iam-policy-binding $PROJECT \
     --member=serviceAccount:packer@$PROJECT.iam.gserviceaccount.com \
     --role=roles/iap.tunnelResourceAccessor
 
+$ gcloud iam service-accounts keys create instruqt-crc.json --iam-account=packer@$PROJECT.iam.gserviceaccount.com
+
+$ export GOOGLE_APPLICATION_CREDENTIALS=instruqt-crc.json
+
 $ qemu-img convert -f qcow2 -O vmdk -o subformat=streamOptimized,compat6 ~/.crc/cache/crc_libvirt_4.8.4/crc.qcow2 crc-1.31.vmdk
 
 upload the resulting image to google cloud storage
