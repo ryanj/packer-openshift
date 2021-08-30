@@ -33,10 +33,10 @@ source "googlecompute" "crc" {
   disk_size    = 40
 
   ssh_username = "core"
-  #ssh_private_key_file = "id_ecdsa_crc"
+  ssh_private_key_file = "id_ecdsa_crc"
 
   source_image_family = "crc"
-  source_image        = "https://storage.googleapis.com/crc-vm/crc-1.31.2/crc-1.31.2.vmdk"
+  source_image        = "crc-1312-raw"
   image_family        = regex_replace("crc-${regex_replace(var.crc_version, "\\+.*$", "")}", "[^a-zA-Z0-9_-]", "-")
   image_name          = regex_replace("crc-${var.crc_version}-${uuidv4()}", "[^a-zA-Z0-9_-]", "-")
 }
@@ -44,12 +44,20 @@ source "googlecompute" "crc" {
 build {
   sources = ["sources.googlecompute.crc"]
 
+  provisioner "file" {
+      source      = "Users/ryanj/.crc/cache/crc_hyperkit_4.7.5/id_ecdsa_crc"
+      destination = "/root/.ssh/id_ecdsa_crc"
+  }
+
   provisioner "shell" {
     inline = [
       "sudo dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm",
       "sudo dnf install -y jq",
     ]
   }
+
+  # https://github.com/GoogleCloudPlatform/compute-image-packages#package-distribution
+  #"sudo dnf update; sudo dnf install -y google-cloud-packages-archive-keyring google-compute-engine google-compute-engine-oslogin",
   # TODO: copy oc and podman-remote from bundle
   # TODO: include pull secret
 
